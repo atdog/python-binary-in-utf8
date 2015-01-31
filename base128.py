@@ -191,13 +191,18 @@ class base128:
     self.chunksize = chunksize
 
 if __name__ == "__main__":
-	if len(sys.argv) > 1:
+	if len(sys.argv) > 2:
 		k = base128("bitstring")
-		with open(sys.argv[1], "rb") as f:
-			for piece in iter(lambda: f.read(1024), ''):
-				for i,j in k.encode(piece):
-					assert isinstance(j, str), j.__class__
-					sys.stdout.write(j)
+		with open(sys.argv[2], "rb") as f:
+			if sys.argv[1] == "-e":
+				print("[")
+				for i in k.encode(f.read()): print(json.dumps(i),",")
+				print("null]")
+			else:
+				li = json.loads(f.read().decode("utf-8"))
+				del li[-1] # remove null
+				for i in k.decode(li):
+					print(i)
 		sys.exit(0)
 	for t in ["bitstring", "bitarray", "BitVector"]:
 			chunksize = 7
